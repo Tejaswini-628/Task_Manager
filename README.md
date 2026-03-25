@@ -38,7 +38,7 @@ MongoDB Atlas (Cloud Database)
 ### Frontend
 - React.js  
 - Axios  
-- CSS (Custom styling)
+- TailWind
 
 ### Backend
 - Node.js  
