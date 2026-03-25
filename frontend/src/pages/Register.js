@@ -2,9 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
-// ✅ Central API URL
-const API_URL = process.env.REACT_APP_API_URL || "https://task-manager-x6in.onrender.com";
-
 function Register() {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
@@ -16,8 +13,7 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/api/auth/signup`, form);
-      alert("Registered successfully");
+      axios.post("https://task-manager-x6in.onrender.com/api/auth/signup", form)
       navigate("/");
     } catch (err) {
       alert("Error");
@@ -87,7 +83,7 @@ const styles = {
   },
   button: {
     padding: "10px",
-    background: "#1e3a8a",
+    background: "#1e3a8a",   // 🔥 SAME AS LOGIN
     color: "white",
     border: "none",
     borderRadius: "5px",

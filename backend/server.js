@@ -10,6 +10,11 @@ const taskRoutes = require("./routes/taskRoutes");
 dotenv.config();
 
 const app = express();
+const cors = require("cors");
+
+app.use(cors({
+  origin: "*"
+}));
 
 // Middleware
 app.use(express.json());

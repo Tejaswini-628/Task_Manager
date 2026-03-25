@@ -2,9 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-// ✅ Central API URL
-const API_URL = process.env.REACT_APP_API_URL || "https://task-manager-x6in.onrender.com";
-
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
 
@@ -16,7 +13,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await axios.post(`${API_URL}/api/auth/login`, form);
+      axios.post("https://task-manager-x6in.onrender.com/api/auth/login", form)
       localStorage.setItem("token", res.data.token);
       window.location.href = "/dashboard";
     } catch {

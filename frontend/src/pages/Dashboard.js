@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-// ✅ Central API URL
-const API_URL = process.env.REACT_APP_API_URL || "https://task-manager-x6in.onrender.com";
-
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -37,7 +34,7 @@ function Dashboard() {
 
   const token = localStorage.getItem("token");
 
-  // 🌙 Theme
+  // 🌙 Persist Theme
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") setDarkMode(true);
@@ -47,12 +44,12 @@ function Dashboard() {
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
-  // 📦 Fetch Tasks
+  // FETCH TASKS
   const fetchTasks = async () => {
     try {
       setLoading(true);
 
-      const res = await axios.get(`${API_URL}/api/tasks`, {
+      const res = await axios.get("https://task-manager-x6in.onrender.com/api/tasks", {
         headers: { Authorization: "Bearer " + token },
         params: { ...filters, page }
       });
@@ -60,6 +57,7 @@ function Dashboard() {
       setTasks(res.data.tasks);
       setTotalPages(res.data.totalPages);
       setError("");
+
     } catch {
       setError("Failed to load tasks ❌");
     } finally {
@@ -67,9 +65,8 @@ function Dashboard() {
     }
   };
 
-  // 📊 Analytics
   const fetchAnalytics = async () => {
-    const res = await axios.get(`${API_URL}/api/tasks/analytics`, {
+    const res = await axios.get("https://task-manager-x6in.onrender.com/api/tasks/analytics", {
       headers: { Authorization: "Bearer " + token }
     });
     setAnalytics(res.data);
@@ -86,7 +83,7 @@ function Dashboard() {
   const handleFilterChange = (e) =>
     setFilters({ ...filters, [e.target.name]: e.target.value });
 
-  // ➕ Create Task
+  // CREATE
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -96,7 +93,7 @@ function Dashboard() {
     }
 
     await axios.post(
-      `${API_URL}/api/tasks`,
+      "http://localhost:5000/api/tasks",
       { ...form, status: "In Progress" },
       { headers: { Authorization: "Bearer " + token } }
     );
@@ -106,7 +103,7 @@ function Dashboard() {
     fetchAnalytics();
   };
 
-  // ✏️ Edit
+  // EDIT
   const enableEdit = (id) => {
     setTasks(prev =>
       prev.map(t => t._id === id ? { ...t, editing: true } : t)
@@ -121,17 +118,17 @@ function Dashboard() {
 
   const saveEdit = async (task) => {
     await axios.put(
-      `${API_URL}/api/tasks/${task._id}`,
+      `http://localhost:5000/api/tasks/${task._id}`,
       { title: task.title, description: task.description },
       { headers: { Authorization: "Bearer " + token } }
     );
     fetchTasks();
   };
 
-  // ✅ Done
+  // DONE
   const markDone = async (id) => {
     await axios.put(
-      `${API_URL}/api/tasks/${id}`,
+      `http://localhost:5000/api/tasks/${id}`,
       { status: "Done" },
       { headers: { Authorization: "Bearer " + token } }
     );
@@ -139,9 +136,9 @@ function Dashboard() {
     fetchAnalytics();
   };
 
-  // ❌ Delete
+  // DELETE
   const deleteTask = async (id) => {
-    await axios.delete(`${API_URL}/api/tasks/${id}`, {
+    await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
       headers: { Authorization: "Bearer " + token }
     });
     fetchTasks();
@@ -166,6 +163,7 @@ function Dashboard() {
       <div style={styles.header}>
         <h1 style={styles.heading}>Task Manager</h1>
 
+        {/* 🔥 SLIDING TOGGLE */}
         <div
           style={{
             ...styles.toggleContainer,
@@ -187,11 +185,53 @@ function Dashboard() {
       {/* ANALYTICS */}
       <div style={styles.analytics}>
         {["total", "completed", "pending", "completionRate"].map((key) => (
-          <div key={key} style={styles.statCard}>
+          <div
+            key={key}
+            style={{
+              ...styles.statCard,
+              background: darkMode ? "#334155" : "white",
+              border: "none"
+            }}
+          >
             <h3>{key}</h3>
             <p>{analytics[key]}{key === "completionRate" ? "%" : ""}</p>
           </div>
         ))}
+      </div>
+
+      {/* FILTERS */}
+      <div style={styles.filters}>
+        <input
+          placeholder="Search"
+          name="search"
+          onChange={handleFilterChange}
+          style={{
+            ...styles.input,
+            background: darkMode ? "#1e293b" : "white",
+            color: darkMode ? "white" : "black",
+            border: darkMode ? "1px solid #444" : "1px solid #ccc"
+          }}
+        />
+
+        <select name="status" onChange={handleFilterChange} style={styles.input}>
+          <option value="">All Status</option>
+          <option>Todo</option>
+          <option>In Progress</option>
+          <option>Done</option>
+        </select>
+
+        <select name="priority" onChange={handleFilterChange} style={styles.input}>
+          <option value="">All Priority</option>
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+
+        <select name="sort" onChange={handleFilterChange} style={styles.input}>
+          <option value="">Sort</option>
+          <option value="dueDate">Due Date</option>
+          <option value="priority">Priority</option>
+        </select>
       </div>
 
       {/* CREATE */}
@@ -208,36 +248,82 @@ function Dashboard() {
         <button style={styles.button}>Add Task</button>
       </form>
 
-      {/* TASKS */}
+      {/* STATES */}
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {/* TASK LIST */}
       {tasks.map(t => (
-        <div key={t._id} style={styles.taskRow}>
-          <div>
-            <h3>{t.title}</h3>
+        <div
+          key={t._id}
+          style={{
+            ...styles.taskRow,
+            background: darkMode ? "#334155" : "white",
+            border: "none"
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <h3>
+              {t.title}
+              <span style={styles.date}> ({t.dueDate?.substring(0,10)})</span>
+            </h3>
+
             <p>{t.description}</p>
-            <button onClick={()=>markDone(t._id)}>Done</button>
+
+            {t.status !== "Done" && (
+              <button style={styles.doneBtn} onClick={()=>markDone(t._id)}>
+                Mark Done
+              </button>
+            )}
+
+            {t.status === "Done" && (
+              <span style={styles.tick}>✔ Completed</span>
+            )}
           </div>
 
-          <div>
-            <button onClick={()=>deleteTask(t._id)}>Delete</button>
+          <div style={styles.right}>
+            <span style={{...styles.badge, background:getStatusColor(t.status)}}>{t.status}</span>
+            <span style={{...styles.badge, background:getPriorityColor(t.priority)}}>{t.priority}</span>
+
+            <button style={styles.smallBtn} onClick={()=>enableEdit(t._id)}>Edit</button>
+
+            <span style={styles.deleteIcon} onClick={()=>deleteTask(t._id)}>🗑️</span>
           </div>
         </div>
       ))}
+
+      {/* PAGINATION */}
+      <div style={styles.pagination}>
+        <button disabled={page === 1} onClick={() => setPage(page - 1)} style={styles.pageBtn}>Prev</button>
+        <span>Page {page} of {totalPages}</span>
+        <button disabled={page === totalPages} onClick={() => setPage(page + 1)} style={styles.pageBtn}>Next</button>
+      </div>
     </div>
   );
 }
 
 const styles = {
-  container:{padding:"30px"},
-  header:{display:"flex",justifyContent:"space-between"},
+  container:{padding:"30px",minHeight:"100vh"},
+  header:{display:"flex",justifyContent:"space-between",alignItems:"center"},
   heading:{color:"#1e3a8a"},
   toggleContainer:{width:"50px",height:"26px",borderRadius:"20px",display:"flex",alignItems:"center",cursor:"pointer",padding:"2px"},
-  toggleCircle:{width:"22px",height:"22px",borderRadius:"50%",background:"white",display:"flex",alignItems:"center",justifyContent:"center"},
-  analytics:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"10px"},
-  statCard:{padding:"10px",background:"white"},
-  form:{display:"flex",gap:"10px",margin:"20px 0"},
-  input:{padding:"10px"},
-  button:{background:"#1e3a8a",color:"white"},
-  taskRow:{display:"flex",justifyContent:"space-between",margin:"10px 0"}
+  toggleCircle:{width:"22px",height:"22px",borderRadius:"50%",background:"white",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"12px",transition:"0.3s"},
+  analytics:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:"10px",margin:"20px 0"},
+  statCard:{padding:"15px",borderRadius:"10px",textAlign:"center"},
+  filters:{display:"flex",gap:"10px"},
+  form:{display:"flex",gap:"10px",flexWrap:"wrap",margin:"20px 0"},
+  input:{padding:"10px",border:"1px solid #ccc",borderRadius:"5px"},
+  button:{background:"#1e3a8a",color:"white",padding:"10px",border:"none"},
+  taskRow:{padding:"15px",marginBottom:"10px",borderRadius:"8px",display:"flex",justifyContent:"space-between"},
+  right:{display:"flex",gap:"8px",alignItems:"center"},
+  badge:{color:"white",padding:"5px 10px",borderRadius:"20px"},
+  smallBtn:{background:"#1e3a8a",color:"white",border:"none",padding:"5px 10px"},
+  deleteIcon:{color:"#dc3545",cursor:"pointer"},
+  doneBtn:{marginTop:"5px",background:"#1e3a8a",color:"white",border:"none",padding:"5px 10px"},
+  tick:{color:"#28a745"},
+  date:{fontSize:"12px",color:"#888"},
+  pagination:{marginTop:"20px",display:"flex",gap:"10px"},
+  pageBtn:{background:"#1e3a8a",color:"white",border:"none",padding:"5px 10px"}
 };
 
 export default Dashboard;
