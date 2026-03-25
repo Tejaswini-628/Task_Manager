@@ -32,7 +32,17 @@ MongoDB Atlas (Cloud Database)
 ```
 
 ---
+---
 
+# 🌐 Live Demo
+
+🚀 **Frontend (User Interface):**  
+👉 https://your-frontend-link.vercel.app
+
+⚙️ **Backend API:**  
+👉 https://your-backend-link.onrender.com
+
+---
 
 ---
 
