@@ -186,4 +186,9 @@ SIHive/
 │   ├── pages/
 │   └── App.js
 ```
+---
+
+# 📸 Dashboard Preview
+
+![Dashboard Screenshot](https://github.com/Tejaswini-628/Task_Manager/blob/main/dashboard%20(2).png?raw=true)
 
