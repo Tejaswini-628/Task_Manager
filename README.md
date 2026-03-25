@@ -17,16 +17,19 @@ A full-stack productivity web application where users can:
 - Sort tasks by priority and due date  
 - View analytics of their task progress  
 - Navigate tasks with pagination  
-- Manage tasks through a clean dashboard UI  
+- Manage tasks through a clean dashboard UI
+- Toggle between Light and Dark mode 
 
 ---
 
 # 🏗 System Architecture
+```
 React Frontend
 ↓ API Calls
 Node.js + Express Backend
 ↓
 MongoDB Atlas (Cloud Database)
+```
 
 ---
 
