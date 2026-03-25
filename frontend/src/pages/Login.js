@@ -9,17 +9,21 @@ function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      axios.post("https://task-manager-x6in.onrender.com/api/auth/login", form)
-      localStorage.setItem("token", res.data.token);
-      window.location.href = "/dashboard";
-    } catch {
-      alert("Login failed ❌");
-    }
-  };
+  try {
+    const res = await axios.post(
+      "https://task-manager-x6in.onrender.com/api/auth/login",
+      form
+    );
+
+    localStorage.setItem("token", res.data.token);
+    window.location.href = "/dashboard";
+  } catch (err) {
+    alert("Login failed ❌");
+  }
+};
 
   return (
     <div style={styles.container}>
