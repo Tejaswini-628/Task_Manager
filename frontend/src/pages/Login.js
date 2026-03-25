@@ -19,7 +19,8 @@ const handleSubmit = async (e) => {
     );
 
     localStorage.setItem("token", res.data.token);
-    window.location.href = "/dashboard";
+
+    navigate("/dashboard"); // ✅ FIXED
   } catch (err) {
     alert("Login failed ❌");
   }
