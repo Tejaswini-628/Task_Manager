@@ -7,27 +7,24 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 
+const errorHandler = require("./middleware/errorMiddleware");
+
 dotenv.config();
 
 const app = express();
-const cors = require("cors");
 
+// ✅ CORS (ONLY ONCE)
 app.use(cors({
   origin: "*"
 }));
 
 // Middleware
 app.use(express.json());
-app.use(cors());
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB Connected ✅");
-  })
-  .catch((err) => {
-    console.log("MongoDB Error ❌:", err.message);
-  });
+  .then(() => console.log("MongoDB Connected ✅"))
+  .catch((err) => console.log("MongoDB Error ❌:", err.message));
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -38,17 +35,11 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// Global Error Handler
-app.use((err, req, res, next) => {
-  res.status(500).json({ message: err.message });
-});
+// ✅ GLOBAL ERROR HANDLER (MUST BE BEFORE LISTEN)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-const errorHandler = require("./middleware/errorMiddleware");
-
-app.use(errorHandler);
