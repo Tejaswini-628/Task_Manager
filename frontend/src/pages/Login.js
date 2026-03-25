@@ -1,30 +1,45 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const res = await axios.post(
-      "https://task-manager-x6in.onrender.com/api/auth/login",
-      form
-    );
+    console.log("FORM DATA:", form); // 🔍 Debug
 
-    localStorage.setItem("token", res.data.token);
+    // ❗ Prevent empty submit
+    if (!form.email || !form.password) {
+      alert("Please fill all fields ⚠️");
+      return;
+    }
 
-    navigate("/dashboard"); // ✅ FIXED
-  } catch (err) {
-    alert("Login failed ❌");
-  }
-};
+    try {
+      const res = await axios.post(
+        "https://task-manager-x6in.onrender.com/api/auth/login",
+        form
+      );
+
+      console.log("RESPONSE:", res.data); // 🔍 Debug
+
+      localStorage.setItem("token", res.data.token);
+
+      navigate("/dashboard"); // ✅ Correct navigation
+    } catch (err) {
+      console.log("ERROR:", err.response); // 🔍 Debug
+
+      alert(
+        err.response?.data?.message || "Login failed ❌"
+      );
+    }
+  };
 
   return (
     <div style={styles.container}>
@@ -35,6 +50,7 @@ const handleSubmit = async (e) => {
           name="email"
           placeholder="Email"
           onChange={handleChange}
+          value={form.email}
           style={styles.input}
         />
 
@@ -43,6 +59,7 @@ const handleSubmit = async (e) => {
           type="password"
           placeholder="Password"
           onChange={handleChange}
+          value={form.password}
           style={styles.input}
         />
 
